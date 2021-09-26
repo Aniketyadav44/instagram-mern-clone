@@ -6,8 +6,8 @@ const userSchema = mongoose.Schema({
   name: {
     type: String,
   },
-  bio:{
-      type:String
+  bio: {
+    type: String,
   },
   username: {
     type: String,
@@ -23,10 +23,15 @@ const userSchema = mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    default: "",
+    default:
+      "https://res.cloudinary.com/aniketyadav/image/upload/v1632396298/no_image_h0h6lq.jpg",
   },
   followers: [{ type: ObjectId, ref: "User" }],
   following: [{ type: ObjectId, ref: "User" }],
+  verified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 mongoose.model("User", userSchema);

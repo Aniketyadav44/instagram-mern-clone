@@ -4,21 +4,23 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../Keys");
+const requireLogin = require("../Middlewares/requireLogin");
 
 const User = mongoose.model("User");
 
 //Route to signup and create user in mongodb
 router.post("/signup", (req, res) => {
-  const { username, email, password, url } = req.body;
+  const { username, email, password, name } = req.body;
   if (!username || !email || !password) {
     return res.status(422).json({ error: "Please add all the fields!" });
   }
   User.findOne({ username: username })
     .then((savedUser) => {
       if (savedUser) {
-        return res
-          .status(422)
-          .json({ error: "User already exists, try different username!" });
+        return res.status(422).json({
+          error:
+            "The username you entered already belong to an account. Please enter other username and try again.",
+        });
       }
 
       //hashing the password using bcryptjs
@@ -27,7 +29,7 @@ router.post("/signup", (req, res) => {
           username: username,
           email: email,
           password: hashedPassword,
-          photoUrl: url,
+          name: name,
         });
         user
           .save()
@@ -58,14 +60,25 @@ router.post("/signin", (req, res) => {
         return;
       }
       if (!user) {
-        return res
-          .status(422)
-          .json({ error: "Invalid username/email and password!" });
+        return res.status(422).json({
+          error:
+            "The username you entered doesn't belong to an account. Please check your username and try again.",
+        });
       }
       bcrypt.compare(password, user.password).then((doMatch) => {
         if (doMatch) {
           const token = jwt.sign({ _id: user._id }, JWT_SECRET);
-          const { _id, username, email, photoUrl, followers, following } = user;
+          const {
+            _id,
+            username,
+            email,
+            photoUrl,
+            followers,
+            following,
+            verified,
+            name,
+            bio,
+          } = user;
           res.json({
             token: token,
             user: {
@@ -75,12 +88,17 @@ router.post("/signin", (req, res) => {
               photoUrl,
               followers,
               following,
+              verified: verified,
+              name: name,
+              bio: bio,
             },
+            message: "Logged In successfully",
           });
         } else {
-          res
-            .status(422)
-            .json({ error: "Invalid username/email and password!" });
+          res.status(422).json({
+            error:
+              "Sorry, your password was incorrect. Please double-check your password.",
+          });
         }
       });
     }
