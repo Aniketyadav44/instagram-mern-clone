@@ -13,11 +13,13 @@ mongoose.connection.on("connected", () => {
 require("./Models/user");
 require("./Models/post");
 const authRouter = require("./Routes/auth");
+const postRouter = require("./Routes/post");
 const port = process.env.PORT || 5000;
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(authRouter);
+app.use(postRouter);
 
 //app listener
 app.listen(port, () => {
