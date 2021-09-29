@@ -34,7 +34,7 @@ router.get("/allposts", requireLogin, (req, res) => {
   Post.find()
     .sort({ createdAt: -1 })
     .populate("owner", "_id username photoUrl verified followers")
-    .populate("comments.postedBy", "_id username")
+    .populate("comments.postedBy", "_id username photoUrl verified")
     .then((posts) => {
       res.json({ posts });
     })
@@ -47,13 +47,22 @@ router.get("/allposts", requireLogin, (req, res) => {
 router.get("/p/:postId", requireLogin, (req, res) => {
   Post.findById(req.params.postId)
     .populate("owner", "_id username photoUrl verified followers")
-    .populate("comments.postedBy", "_id username")
+    .populate("comments.postedBy", "_id username photoUrl verified")
     .then((result) => {
       res.json(result);
     })
     .catch((err) => {
       console.log(err);
     });
+});
+
+router.get("/userposts", requireLogin, (req, res) => {
+  Post.find({ owner: req.user._id })
+    .populate("owner", "_id username")
+    .then((posts) => {
+      res.json({ posts });
+    })
+    .catch((err) => console.log(err));
 });
 
 //route to like a post by its id
@@ -63,8 +72,8 @@ router.put("/like/:postId", requireLogin, (req, res) => {
     { $push: { likes: req.user._id } },
     { new: true }
   )
-    .populate("owner", "_id username photoUrl")
-    .populate("comments.postedBy","_id username")
+    .populate("owner", "_id username photoUrl verified followers")
+    .populate("comments.postedBy", "_id username photoUrl verified")
     .exec((err, result) => {
       if (err) {
         res.status(422).json({ error: err });
@@ -80,8 +89,8 @@ router.put("/unlike/:postId", requireLogin, (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .populate("owner", "_id username photoUrl")
-    .populate("comments.postedBy","_id username")
+    .populate("owner", "_id username photoUrl verified followers")
+    .populate("comments.postedBy", "_id username photoUrl verified")
     .exec((err, result) => {
       if (err) {
         res.status(422).json({ error: err });
@@ -104,8 +113,8 @@ router.put("/comment", requireLogin, (req, res) => {
     },
     { new: true }
   )
-    .populate("owner", "_id username photoUrl")
-    .populate("comments.postedBy", "_id username")
+    .populate("owner", "_id username photoUrl verified followers")
+    .populate("comments.postedBy", "_id username photoUrl verified")
     .exec((err, result) => {
       if (err) {
         return res.status(422).json({ error: err });
