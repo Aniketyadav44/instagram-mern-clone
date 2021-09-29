@@ -144,4 +144,18 @@ router.delete("/deletepost/:postId", requireLogin, (req, res) => {
     });
 });
 
+//router to edit post by passing comment and location in body
+router.put("/editpost", requireLogin, (req, res) => {
+  const { postId, newCaption, newLocation } = req.body;
+  Post.findByIdAndUpdate(
+    postId,
+    { $set: { caption: newCaption, location: newLocation } },
+    { new: true }
+  )
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => console.log(err));
+});
+
 module.exports = router;
