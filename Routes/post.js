@@ -123,4 +123,25 @@ router.put("/comment", requireLogin, (req, res) => {
     });
 });
 
+//router to delete post by passing it's id in params
+router.delete("/deletepost/:postId", requireLogin, (req, res) => {
+  Post.findOne({ _id: req.params.postId })
+    .populate("owner", "_id")
+    .exec((err, post) => {
+      if (err || !post) {
+        return res.status(422).json({ error: "Post not found" });
+      }
+      if (post) {
+        if (post.owner._id.toString() === req.user._id.toString()) {
+          post
+            .remove()
+            .then((result) => {
+              res.json(result);
+            })
+            .catch((err) => console.log(err));
+        }
+      }
+    });
+});
+
 module.exports = router;

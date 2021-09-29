@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../Keys");
 
 const User = mongoose.model("User");
 
@@ -66,7 +65,7 @@ router.post("/signin", (req, res) => {
       }
       bcrypt.compare(password, user.password).then((doMatch) => {
         if (doMatch) {
-          const token = jwt.sign({ _id: user._id }, JWT_SECRET);
+          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
           const {
             _id,
             username,
