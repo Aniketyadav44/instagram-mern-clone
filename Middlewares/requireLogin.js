@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
   const token = authorization;
   jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
     if (err) {
-      return res.stat(401).json({ error: "You must be signed in!" });
+      return res.status(401).json({ error: "You must be signed in!" });
     }
     const { _id } = payload;
     User.findById(_id).then((userData) => {

@@ -100,4 +100,32 @@ router.put("/updatephoto", requireLogin, (req, res) => {
     .catch((err) => console.log(err));
 });
 
+//route to check if user with passed username exists or not
+router.get("/checkuser/:entered", requireLogin, (req, res) => {
+  User.findOne({ username: req.params.entered })
+    .then((user) => {
+      if (user) {
+        return res.json({ message: "exists" });
+      }
+      res.json({ message: "not exists" });
+    })
+    .catch((err) => console.log(err));
+});
+
+//route to update the user
+router.put("/updateuser", requireLogin, (req, res) => {
+  const { userId, name, email, username } = req.body;
+  User.findByIdAndUpdate(
+    userId,
+    {
+      $set: { name: name, username: username, email: email },
+    },
+    { new: true }
+  ).select("-password")
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => console.log(err));
+});
+
 module.exports = router;
