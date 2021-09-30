@@ -92,4 +92,12 @@ router.get("/userlist/:arrayparams", requireLogin, (req, res) => {
     .catch((err) => console.log(err));
 });
 
+//route to update image of user by passing userid and photo url in body
+router.put("/updatephoto", requireLogin, (req, res) => {
+  const { userId, photoUrl } = req.body;
+  User.findByIdAndUpdate(userId, { photoUrl: photoUrl })
+    .then((result) => {})
+    .catch((err) => console.log(err));
+});
+
 module.exports = router;
