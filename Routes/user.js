@@ -9,7 +9,7 @@ const User = mongoose.model("User");
 //route to get user details by passing username
 router.get("/user/:userId", requireLogin, (req, res) => {
   User.findOne({ _id: req.params.userId })
-    .select("-password")
+    .select("-password -resetToken -expireToken")
     .then((user) => {
       Post.find({ owner: req.params.userId })
         .populate("owner", "_id username photoUrl verified followers")
@@ -45,7 +45,7 @@ router.put("/follow", requireLogin, (req, res) => {
         },
         { new: true }
       )
-        .select("-password")
+        .select("-password  -resetToken -expireToken")
         .then((result) => {
           res.json(result);
         })
@@ -69,7 +69,7 @@ router.put("/unfollow", requireLogin, (req, res) => {
       User.findByIdAndUpdate(req.user._id, {
         $pull: { following: req.body.unfollowId },
       })
-        .select("-password")
+        .select("-password  -resetToken -expireToken")
         .then((result) => {
           res.json(result);
         })
@@ -85,7 +85,7 @@ router.get("/userlist/:arrayparams", requireLogin, (req, res) => {
     mongoose.Types.ObjectId(string)
   );
   User.find({ _id: { $in: objectArray } })
-    .select("-password")
+    .select("-password  -resetToken -expireToken")
     .then((result) => {
       res.json(result);
     })
@@ -114,14 +114,15 @@ router.get("/checkuser/:entered", requireLogin, (req, res) => {
 
 //route to update the user
 router.put("/updateuser", requireLogin, (req, res) => {
-  const { userId, name, email, username } = req.body;
+  const { userId, name, email, username, bio } = req.body;
   User.findByIdAndUpdate(
     userId,
     {
-      $set: { name: name, username: username, email: email },
+      $set: { name: name, username: username, email: email, bio: bio },
     },
     { new: true }
-  ).select("-password")
+  )
+    .select("-password  -resetToken -expireToken")
     .then((result) => {
       res.json(result);
     })

@@ -6,9 +6,6 @@ const userSchema = mongoose.Schema({
   name: {
     type: String,
   },
-  bio: {
-    type: String,
-  },
   username: {
     type: String,
     require: true,
@@ -21,6 +18,9 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  resetToken: String,
+  expireToken: Date,
+  bio: String,
   photoUrl: {
     type: String,
     default:
