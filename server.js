@@ -26,6 +26,15 @@ app.use(postRouter);
 app.use(userRouter);
 app.use(cloudinaryRouter);
 
+//If we are on production(deployed)
+if (process.env.NODE_ENV == "production") {
+  app.use(express.static("client/build"));
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
 //app listener
 app.listen(port, () => {
   console.log("Server started at port", port);
