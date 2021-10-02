@@ -129,4 +129,20 @@ router.put("/updateuser", requireLogin, (req, res) => {
     .catch((err) => console.log(err));
 });
 
+//route to get users list by passing regex parameter
+router.post("/search-users", (req, res) => {
+  let userPattern = new RegExp("^" + req.body.query);
+  User.find({
+    $or: [
+      { username: { $regex: userPattern } },
+      { name: { $regex: userPattern } },
+    ],
+  })
+  .select("-password -followers -following -email -bio")
+    .then((user) => {
+      res.json({ user });
+    })
+    .catch((err) => console.log(err));
+});
+
 module.exports = router;
